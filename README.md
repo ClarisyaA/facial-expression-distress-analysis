@@ -18,9 +18,9 @@ https://facial-expression-distress-analysis.streamlit.app/
 
 | Name | Student ID |
 | --- | --- |
-| Siti Aisyah Nurdyanti (Isya) | 140810230015 |
-| Clarisya Adeline (Ica) | 140810230017 |
-| Nazwa Nashatasya (Awa) | 140810230019 |
+| Siti Aisyah Nurdyanti | 140810230015 |
+| Clarisya Adeline | 140810230017 |
+| Nazwa Nashatasya  | 140810230019 |
 
 ## Dataset
 

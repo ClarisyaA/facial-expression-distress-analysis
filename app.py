@@ -1391,6 +1391,61 @@ def stress_level_label(score):
         return "High", "High", "stress-high"
 
 # ─────────────────────────────────────────────
+def build_rtc_configuration():
+    """
+    Build ICE server settings for streamlit-webrtc.
+    Streamlit Cloud often needs more than one STUN server, and some networks
+    require TURN. Optional private TURN values can be set in Streamlit secrets:
+
+    [webrtc]
+    turn_url = "turn:your-turn-server:3478"
+    turn_username = "username"
+    turn_credential = "credential"
+    """
+    ice_servers = [
+        {
+            "urls": [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+                "stun:stun2.l.google.com:19302",
+                "stun:global.stun.twilio.com:3478",
+            ]
+        },
+        {
+            "urls": [
+                "turn:openrelay.metered.ca:80",
+                "turn:openrelay.metered.ca:443",
+                "turn:openrelay.metered.ca:443?transport=tcp",
+            ],
+            "username": "openrelayproject",
+            "credential": "openrelayproject",
+        },
+    ]
+
+    try:
+        webrtc_secrets = st.secrets.get("webrtc", {})
+        turn_url = webrtc_secrets.get("turn_url")
+        turn_username = webrtc_secrets.get("turn_username")
+        turn_credential = webrtc_secrets.get("turn_credential")
+        if turn_url and turn_username and turn_credential:
+            ice_servers.insert(
+                0,
+                {
+                    "urls": [turn_url],
+                    "username": turn_username,
+                    "credential": turn_credential,
+                },
+            )
+    except Exception:
+        pass
+
+    return RTCConfiguration(
+        {
+            "iceServers": ice_servers,
+            "iceCandidatePoolSize": 10,
+        }
+    )
+
 # REAL-TIME WEBCAM PROCESSOR  (NEW FEATURE)
 # Uses streamlit-webrtc + existing pipeline
 # All optimizations applied:
@@ -2036,9 +2091,7 @@ else:
     st.session_state["rt_model"]        = model
     st.session_state["rt_model_loaded"] = model_loaded
 
-    RTC_CONFIG = RTCConfiguration(
-        {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-    )
+    RTC_CONFIG = build_rtc_configuration()
 
     realtime_width = st.slider(
         "Ukuran tampilan realtime",

@@ -157,7 +157,7 @@ Optimizations:
 | FPS limit | Webcam constraint uses `frameRate: {ideal: 15, max: 15}`. |
 | Safe handling | Exceptions are caught to prevent stream crashes. |
 | Display size slider | User can adjust realtime display width from 35% to 100%. |
-| ICE configuration | Uses multiple STUN servers plus TURN fallback to reduce delayed WebRTC connection warnings on Streamlit Cloud. |
+| ICE configuration | Uses multiple STUN servers and supports optional private TURN secrets for stricter networks. |
 
 Prediction smoothing:
 
@@ -178,7 +178,7 @@ Bounding box color:
 - Red: High
 ```
 
-Optional private TURN configuration for Streamlit Cloud secrets:
+Optional private TURN configuration for Streamlit Cloud secrets. Use this only if realtime webcam still has trouble connecting on a restrictive network:
 
 ```toml
 [webrtc]

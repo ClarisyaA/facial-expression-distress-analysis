@@ -1398,7 +1398,9 @@ def build_rtc_configuration():
     """
     Build ICE server settings for streamlit-webrtc.
     Streamlit Cloud often needs more than one STUN server, and some networks
-    require TURN. Optional private TURN values can be set in Streamlit secrets:
+    require TURN. TURN is intentionally opt-in because public TURN relays can
+    create noisy aioice retry errors when Streamlit reloads the app. Optional
+    private TURN values can be set in Streamlit secrets:
 
     [webrtc]
     turn_url = "turn:your-turn-server:3478"
@@ -1413,16 +1415,7 @@ def build_rtc_configuration():
                 "stun:stun2.l.google.com:19302",
                 "stun:global.stun.twilio.com:3478",
             ]
-        },
-        {
-            "urls": [
-                "turn:openrelay.metered.ca:80",
-                "turn:openrelay.metered.ca:443",
-                "turn:openrelay.metered.ca:443?transport=tcp",
-            ],
-            "username": "openrelayproject",
-            "credential": "openrelayproject",
-        },
+        }
     ]
 
     try:
@@ -1442,12 +1435,7 @@ def build_rtc_configuration():
     except Exception:
         pass
 
-    return RTCConfiguration(
-        {
-            "iceServers": ice_servers,
-            "iceCandidatePoolSize": 10,
-        }
-    )
+    return RTCConfiguration({"iceServers": ice_servers})
 
 # REAL-TIME WEBCAM PROCESSOR  (NEW FEATURE)
 # Uses streamlit-webrtc + existing pipeline

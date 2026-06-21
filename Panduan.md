@@ -103,7 +103,7 @@ Output real-time menampilkan:
 - Skor distress.
 - Kategori distress.
 
-Aplikasi sudah memakai beberapa STUN server dan fallback TURN agar koneksi WebRTC di Streamlit Cloud lebih cepat tersambung. Jika jaringan tertentu masih menampilkan pesan koneksi lama, tambahkan konfigurasi TURN pribadi di Streamlit secrets:
+Aplikasi sudah memakai beberapa STUN server agar koneksi WebRTC di Streamlit Cloud lebih mudah tersambung. Jika jaringan tertentu masih menampilkan pesan koneksi lama, tambahkan konfigurasi TURN pribadi di Streamlit secrets:
 
 ```toml
 [webrtc]

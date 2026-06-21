@@ -4,6 +4,16 @@ Streamlit demo application for facial emotion recognition and emotional stress l
 
 This project was built for the Soft Computing course as an academic prototype. It combines CNN, LBP, HOG, and ANFIS-based fuzzy reasoning to classify facial emotion and estimate a stress score from facial expression input.
 
+## Live App
+
+Application URL:
+
+https://facial-expression-distress-analysis.streamlit.app/
+
+## Poster
+
+![Project Poster](poster/1.png)
+
 ## Team
 
 | Name | Student ID |
@@ -15,6 +25,8 @@ This project was built for the Soft Computing course as an academic prototype. I
 ## Dataset
 
 FER2013 from Kaggle:
+
+https://www.kaggle.com/datasets/msambare/fer2013
 
 - 35,887 original grayscale face images
 - 48 x 48 pixels
@@ -52,6 +64,14 @@ Training notebook reference:
 | Simulation Mode | Deterministic fallback when ANFIS weights are not available. |
 
 ## How to Run
+
+The deployment runtime is pinned in:
+
+```text
+runtime.txt
+```
+
+The app uses Python 3.11 because TensorFlow does not yet provide compatible wheels for every newer Python release. This avoids dependency resolution failures on Streamlit Community Cloud.
 
 ### 1. Install dependencies
 
@@ -297,11 +317,14 @@ Emotion-to-stress weights:
 facial-expression-distress-analysis/
 |-- app.py
 |-- README.md
+|-- Panduan.md
 |-- requirements.txt
 |-- anfis_emotion_model.weights.h5
 |-- deploy.prototxt
 |-- res10_300x300_ssd_iter_140000.caffemodel
 |-- (NEWEST)ANFIS_Hybrid_FacialEmotion_Final (1).ipynb
+|-- poster/
+    |-- 1.png
 ```
 
 File roles:
@@ -310,11 +333,14 @@ File roles:
 | --- | --- |
 | `app.py` | Main Streamlit application. |
 | `README.md` | Project documentation. |
+| `Panduan.md` | Indonesian user guide for the deployed Streamlit app. |
 | `requirements.txt` | Python dependencies. |
+| `runtime.txt` | Python version pin for Streamlit deployment. |
 | `anfis_emotion_model.weights.h5` | Trained ANFIS Hybrid model weights. |
 | `deploy.prototxt` | OpenCV DNN face detector architecture. |
 | `res10_300x300_ssd_iter_140000.caffemodel` | OpenCV DNN face detector weights. |
 | `(NEWEST)ANFIS_Hybrid_FacialEmotion_Final (1).ipynb` | Training and experiment notebook. |
+| `poster/1.png` | Project poster image displayed in this README. |
 
 ## Dependencies
 

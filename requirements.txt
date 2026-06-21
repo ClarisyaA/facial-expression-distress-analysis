@@ -11,7 +11,6 @@ Pillow>=10.0.0
 pandas>=2.0.0
 scipy>=1.11.0
 tornado>=6.3.0
-twilio>=9.0.0
 av==12.3.0
 aioice==0.9.0
 aiortc==1.9.0

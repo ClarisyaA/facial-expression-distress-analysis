@@ -103,26 +103,24 @@ Output real-time menampilkan:
 - Skor distress.
 - Kategori distress.
 
-Aplikasi sudah memakai beberapa STUN server agar koneksi WebRTC di Streamlit Cloud lebih mudah tersambung. Jika mode realtime berhenti di START/loading, tambahkan TURN server melalui Streamlit secrets.
+Catatan penggunaan:
 
-Rekomendasi konfigurasi Twilio Network Traversal:
+- Mode **Upload Image** dan **Capture dari Webcam** disarankan untuk aplikasi yang dibuka melalui Streamlit Cloud.
+- Mode **Real-Time Webcam** paling disarankan dijalankan secara lokal karena memakai WebRTC, yang dapat terhambat oleh jaringan atau browser saat aplikasi berjalan di Streamlit Cloud.
 
-```toml
-[twilio]
-account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+Untuk menjalankan realtime secara lokal:
+
+```bash
+streamlit run app.py
 ```
 
-Alternatif konfigurasi TURN manual:
+Lalu buka:
 
-```toml
-[webrtc]
-turn_url = "turn:your-turn-server:3478"
-turn_username = "username"
-turn_credential = "credential"
+```text
+http://localhost:8501
 ```
 
-Jika belum memakai TURN server, gunakan mode **Capture dari Webcam** sebagai fallback yang lebih stabil.
+Dengan menjalankan secara lokal, mode realtime tidak perlu memakai layanan TURN berbayar seperti Twilio.
 
 ## Membaca Hasil Analisis
 

@@ -1464,20 +1464,8 @@ def build_rtc_configuration():
     """
     Build ICE server settings for streamlit-webrtc.
     Streamlit Cloud often needs more than one STUN server, and some networks
-    require TURN. TURN is intentionally opt-in because public TURN relays can
-    create noisy aioice retry errors when Streamlit reloads the app. Optional
-    private TURN values can be set in Streamlit secrets:
-
-    [twilio]
-    account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-
-    or:
-
-    [webrtc]
-    turn_url = "turn:your-turn-server:3478"
-    turn_username = "username"
-    turn_credential = "credential"
+    require TURN. For this academic demo, realtime webcam is recommended to
+    run locally, while Streamlit Cloud is recommended for upload/capture modes.
     """
     ice_servers = [
         {
@@ -1489,42 +1477,7 @@ def build_rtc_configuration():
             ]
         }
     ]
-    has_turn = False
-
-    try:
-        twilio_secrets = st.secrets.get("twilio", {})
-        account_sid = twilio_secrets.get("account_sid")
-        auth_token = twilio_secrets.get("auth_token")
-        if account_sid and auth_token:
-            from twilio.rest import Client
-
-            token = Client(account_sid, auth_token).tokens.create()
-            if token.ice_servers:
-                ice_servers = token.ice_servers
-                has_turn = any(
-                    "turn:" in str(server.get("urls", ""))
-                    for server in ice_servers
-                    if isinstance(server, dict)
-                )
-
-        webrtc_secrets = st.secrets.get("webrtc", {})
-        turn_url = webrtc_secrets.get("turn_url")
-        turn_username = webrtc_secrets.get("turn_username")
-        turn_credential = webrtc_secrets.get("turn_credential")
-        if turn_url and turn_username and turn_credential:
-            ice_servers.insert(
-                0,
-                {
-                    "urls": [turn_url],
-                    "username": turn_username,
-                    "credential": turn_credential,
-                },
-            )
-            has_turn = True
-    except Exception:
-        pass
-
-    return RTCConfiguration({"iceServers": ice_servers}), has_turn
+    return RTCConfiguration({"iceServers": ice_servers})
 
 # REAL-TIME WEBCAM PROCESSOR  (NEW FEATURE)
 # Uses streamlit-webrtc + existing pipeline
@@ -2172,14 +2125,12 @@ else:
     rt_model = model
     rt_model_loaded = model_loaded
 
-    RTC_CONFIG, has_turn_server = build_rtc_configuration()
+    RTC_CONFIG = build_rtc_configuration()
 
-    if not has_turn_server:
-        st.warning(
-            "Mode realtime memakai WebRTC. Jika video berhenti di START/loading pada Streamlit Cloud, "
-            "tambahkan TURN server lewat Streamlit secrets. Mode Capture dari Webcam tetap bisa dipakai "
-            "tanpa konfigurasi TURN."
-        )
+    st.info(
+        "Mode realtime paling stabil dijalankan secara lokal dengan `streamlit run app.py`. "
+        "Pada Streamlit Cloud, gunakan mode Upload Gambar atau Capture dari Webcam jika realtime tidak tersambung."
+    )
 
     realtime_width = st.slider(
         "Ukuran tampilan realtime",

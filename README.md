@@ -157,7 +157,7 @@ Optimizations:
 | FPS limit | Webcam constraint uses `frameRate: {ideal: 15, max: 15}`. |
 | Safe handling | Exceptions are caught to prevent stream crashes. |
 | Display size slider | User can adjust realtime display width from 35% to 100%. |
-| ICE configuration | Uses multiple STUN servers and supports optional private TURN secrets for stricter networks. |
+| Recommended runtime | Run locally for the most reliable realtime webcam connection. |
 
 Prediction smoothing:
 
@@ -178,26 +178,23 @@ Bounding box color:
 - Red: High
 ```
 
-Optional private TURN configuration for Streamlit Cloud secrets. Use this only if realtime webcam still has trouble connecting on a restrictive network:
+### Realtime webcam note
 
-Recommended Twilio Network Traversal secrets:
+The deployed Streamlit Cloud app is recommended for **Upload Image** and **Capture dari Webcam** modes.
 
-```toml
-[twilio]
-account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+For **Real-Time Webcam Detection**, run the app locally:
+
+```bash
+streamlit run app.py
 ```
 
-Manual TURN secrets:
+Then open:
 
-```toml
-[webrtc]
-turn_url = "turn:your-turn-server:3478"
-turn_username = "username"
-turn_credential = "credential"
+```text
+http://localhost:8501
 ```
 
-Without a valid TURN server, some networks may keep the realtime webcam stuck at START/loading. In that case, use **Capture dari Webcam** as the reliable fallback.
+Realtime mode uses WebRTC, which can be blocked or delayed on Streamlit Cloud depending on the user's network and browser. Running locally avoids the need for paid TURN services and is the easiest setup for demos.
 
 ## Model Architecture
 

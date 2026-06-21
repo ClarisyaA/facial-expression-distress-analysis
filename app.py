@@ -1468,6 +1468,12 @@ def build_rtc_configuration():
     create noisy aioice retry errors when Streamlit reloads the app. Optional
     private TURN values can be set in Streamlit secrets:
 
+    [twilio]
+    account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+    or:
+
     [webrtc]
     turn_url = "turn:your-turn-server:3478"
     turn_username = "username"
@@ -1483,8 +1489,24 @@ def build_rtc_configuration():
             ]
         }
     ]
+    has_turn = False
 
     try:
+        twilio_secrets = st.secrets.get("twilio", {})
+        account_sid = twilio_secrets.get("account_sid")
+        auth_token = twilio_secrets.get("auth_token")
+        if account_sid and auth_token:
+            from twilio.rest import Client
+
+            token = Client(account_sid, auth_token).tokens.create()
+            if token.ice_servers:
+                ice_servers = token.ice_servers
+                has_turn = any(
+                    "turn:" in str(server.get("urls", ""))
+                    for server in ice_servers
+                    if isinstance(server, dict)
+                )
+
         webrtc_secrets = st.secrets.get("webrtc", {})
         turn_url = webrtc_secrets.get("turn_url")
         turn_username = webrtc_secrets.get("turn_username")
@@ -1498,10 +1520,11 @@ def build_rtc_configuration():
                     "credential": turn_credential,
                 },
             )
+            has_turn = True
     except Exception:
         pass
 
-    return RTCConfiguration({"iceServers": ice_servers})
+    return RTCConfiguration({"iceServers": ice_servers}), has_turn
 
 # REAL-TIME WEBCAM PROCESSOR  (NEW FEATURE)
 # Uses streamlit-webrtc + existing pipeline
@@ -2149,7 +2172,14 @@ else:
     rt_model = model
     rt_model_loaded = model_loaded
 
-    RTC_CONFIG = build_rtc_configuration()
+    RTC_CONFIG, has_turn_server = build_rtc_configuration()
+
+    if not has_turn_server:
+        st.warning(
+            "Mode realtime memakai WebRTC. Jika video berhenti di START/loading pada Streamlit Cloud, "
+            "tambahkan TURN server lewat Streamlit secrets. Mode Capture dari Webcam tetap bisa dipakai "
+            "tanpa konfigurasi TURN."
+        )
 
     realtime_width = st.slider(
         "Ukuran tampilan realtime",

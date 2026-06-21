@@ -103,7 +103,17 @@ Output real-time menampilkan:
 - Skor distress.
 - Kategori distress.
 
-Aplikasi sudah memakai beberapa STUN server agar koneksi WebRTC di Streamlit Cloud lebih mudah tersambung. Jika jaringan tertentu masih menampilkan pesan koneksi lama, tambahkan konfigurasi TURN pribadi di Streamlit secrets:
+Aplikasi sudah memakai beberapa STUN server agar koneksi WebRTC di Streamlit Cloud lebih mudah tersambung. Jika mode realtime berhenti di START/loading, tambahkan TURN server melalui Streamlit secrets.
+
+Rekomendasi konfigurasi Twilio Network Traversal:
+
+```toml
+[twilio]
+account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+Alternatif konfigurasi TURN manual:
 
 ```toml
 [webrtc]
@@ -111,6 +121,8 @@ turn_url = "turn:your-turn-server:3478"
 turn_username = "username"
 turn_credential = "credential"
 ```
+
+Jika belum memakai TURN server, gunakan mode **Capture dari Webcam** sebagai fallback yang lebih stabil.
 
 ## Membaca Hasil Analisis
 

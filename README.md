@@ -180,12 +180,24 @@ Bounding box color:
 
 Optional private TURN configuration for Streamlit Cloud secrets. Use this only if realtime webcam still has trouble connecting on a restrictive network:
 
+Recommended Twilio Network Traversal secrets:
+
+```toml
+[twilio]
+account_sid = "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+auth_token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+Manual TURN secrets:
+
 ```toml
 [webrtc]
 turn_url = "turn:your-turn-server:3478"
 turn_username = "username"
 turn_credential = "credential"
 ```
+
+Without a valid TURN server, some networks may keep the realtime webcam stuck at START/loading. In that case, use **Capture dari Webcam** as the reliable fallback.
 
 ## Model Architecture
 

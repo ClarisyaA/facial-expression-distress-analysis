@@ -20,6 +20,7 @@ import av
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 import io
 import threading
+import asyncio
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -52,6 +53,41 @@ def suppress_aioice_shutdown_retry_errors():
         pass
 
 suppress_aioice_shutdown_retry_errors()
+
+def suppress_asyncio_aioice_callback_logs():
+    """
+    Some aioice retry callbacks are scheduled before Streamlit Cloud finishes
+    replacing the old app instance. This keeps those stale callback errors from
+    flooding the deployment log while preserving unrelated asyncio exceptions.
+    """
+    try:
+        loop = asyncio.get_event_loop()
+        previous_handler = loop.get_exception_handler()
+
+        def safe_exception_handler(loop, context):
+            exception = context.get("exception")
+            handle = str(context.get("handle", ""))
+            message = str(context.get("message", ""))
+            if (
+                isinstance(exception, AttributeError)
+                and "Transaction.__retry" in handle
+                and (
+                    "sendto" in str(exception)
+                    or "call_exception_handler" in str(exception)
+                    or "Exception in callback" in message
+                )
+            ):
+                return
+            if previous_handler is not None:
+                previous_handler(loop, context)
+            else:
+                loop.default_exception_handler(context)
+
+        loop.set_exception_handler(safe_exception_handler)
+    except Exception:
+        pass
+
+suppress_asyncio_aioice_callback_logs()
 
 # ─────────────────────────────────────────────
 # GLOBAL CACHED FACE DETECTOR (Optimization #3)

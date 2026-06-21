@@ -23,6 +23,36 @@ import threading
 import warnings
 warnings.filterwarnings("ignore")
 
+def suppress_aioice_shutdown_retry_errors():
+    """
+    streamlit-webrtc can leave aioice STUN retry timers alive briefly while
+    Streamlit Cloud hot-reloads the app. If the UDP transport is already
+    closed, aioice may raise noisy AttributeError callbacks even though the
+    new app instance continues running normally.
+    """
+    try:
+        from aioice.stun import Transaction
+
+        original_retry = getattr(Transaction, "_Transaction__retry", None)
+        if original_retry is None or getattr(original_retry, "_anfis_safe_retry", False):
+            return
+
+        def safe_retry(self, *args, **kwargs):
+            try:
+                return original_retry(self, *args, **kwargs)
+            except AttributeError as exc:
+                msg = str(exc)
+                if "sendto" in msg or "call_exception_handler" in msg:
+                    return None
+                raise
+
+        safe_retry._anfis_safe_retry = True
+        setattr(Transaction, "_Transaction__retry", safe_retry)
+    except Exception:
+        pass
+
+suppress_aioice_shutdown_retry_errors()
+
 # ─────────────────────────────────────────────
 # GLOBAL CACHED FACE DETECTOR (Optimization #3)
 # Initialized once at module load — NOT inside preprocessing loop

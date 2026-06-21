@@ -5,6 +5,9 @@ Tim: Isya · Ica · Awa | Soft Computing Project
 """
 
 import os
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "-1")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
 import streamlit as st
 import numpy as np
 import cv2
@@ -2087,9 +2090,10 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # Cache model reference into session_state so the processor thread can access it
-    st.session_state["rt_model"]        = model
-    st.session_state["rt_model_loaded"] = model_loaded
+    # Capture model references before WebRTC starts so worker threads do not
+    # access Streamlit session_state and emit ScriptRunContext warnings.
+    rt_model = model
+    rt_model_loaded = model_loaded
 
     RTC_CONFIG = build_rtc_configuration()
 
@@ -2109,8 +2113,8 @@ else:
             mode=WebRtcMode.SENDRECV,
             rtc_configuration=RTC_CONFIG,
             video_processor_factory=lambda: RealtimeEmotionProcessor(
-                model=st.session_state.get("rt_model", None),
-                mdl_loaded=st.session_state.get("rt_model_loaded", False)
+                model=rt_model,
+                mdl_loaded=rt_model_loaded
             ),
         # Optimisation #5 — limit webcam FPS + resolution
             media_stream_constraints={
